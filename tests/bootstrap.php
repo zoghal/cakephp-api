@@ -83,15 +83,21 @@ Configure::write('App', [
 // Cake\Core\Configure::write('App.encoding', 'UTF-8');
 Cake\Core\Configure::write('debug', true);
 
-@mkdir(TMP . 'cache/models', 0777);
-@mkdir(TMP . 'cache/persistent', 0777);
-@mkdir(TMP . 'cache/views', 0777);
+if (!file_exists(TMP . 'cache/models')) {
+    mkdir(TMP . 'cache/models', 0777);
+}
+if (!file_exists(TMP . 'cache/persistent')) {
+    mkdir(TMP . 'cache/persistent', 0777);
+}
+if (!file_exists(TMP . 'cache/views')) {
+    mkdir(TMP . 'cache/views', 0777);
+}
 
 $cache = [
     'default' => [
         'engine' => 'File',
     ],
-    '_cake_core_' => [
+    '_cake_translations_' => [
         'className' => 'File',
         'prefix' => 'api_app_cake_core_',
         'path' => CACHE . 'persistent/',
@@ -131,6 +137,8 @@ Cake\Core\Configure::write('Email', [
 Cake\Core\Configure::write('Session', [
     'defaults' => 'php',
 ]);
+session_id('cli');
+
 Cake\Core\Configure::write('Security.salt', 'bc8b5b70eb0e18bac40204dc3a5b9fbc8b5b70eb0e18bac40204dc3a5b9f');
 
 mb_internal_encoding(Configure::read('App.encoding'));
