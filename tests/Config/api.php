@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Copyright 2016 - 2019, Cake Development Corporation (http://cakedc.com)
  *
@@ -49,11 +51,11 @@ if (empty($config)) {
             'Jwt' => [
                 'AccessToken' => [
                     'lifetime' => 600,
-                    'secret' => 'secret',
+                    'secret' => 'this is a long secret, that must be longer than 512 bits if not an exception will be thrown',
                 ],
                 'RefreshToken' => [
                     'lifetime' => 14 * 86400,
-                    'secret' => 'secret',
+                    'secret' => 'this is a long secret, that must be longer than 512 bits if not an exception will be thrown',
                 ],
             ],
 

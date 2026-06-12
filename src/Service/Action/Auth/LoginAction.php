@@ -19,6 +19,8 @@ use CakeDC\Api\Exception\ValidationException;
 use CakeDC\Api\Service\Action\Action;
 use CakeDC\Users\Controller\Traits\LoginTrait;
 use CakeDC\Users\Exception\UserNotFoundException;
+use Authentication\IdentityInterface;
+use Cake\Datasource\EntityInterface;
 
 /**
  * Class LoginAction
@@ -78,10 +80,18 @@ class LoginAction extends Action
      *
      * @return mixed
      */
-    public function execute()
+    public function execute(): mixed
     {
         $socialLogin = false;
         $user = $this->Auth->getIdentity();
+
+        if ($user instanceof IdentityInterface) {
+            $user = $user->getOriginalData()->toArray();
+        }
+        if ($user instanceof EntityInterface) {
+            $user = $user->toArray();
+        }
+
         $user = $this->_afterIdentifyUser($user, $socialLogin);
         if (empty($user)) {
             throw new UserNotFoundException(__d('CakeDC/Api', 'User not found'), 401);
@@ -97,7 +107,7 @@ class LoginAction extends Action
      * @param bool $socialLogin is social login
      * @return array
      */
-    protected function _afterIdentifyUser($user, $socialLogin = false)
+    protected function _afterIdentifyUser(?array $user, bool $socialLogin = false): array
     {
         if (!empty($user)) {
 //???            $this->Auth->setUser($user);
@@ -108,7 +118,7 @@ class LoginAction extends Action
             $user = $event->getResult();
         }
 
-        return $user;
+        return $user ?? [];
     }
 
     /**

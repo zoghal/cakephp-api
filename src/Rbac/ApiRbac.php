@@ -23,6 +23,7 @@ use CakeDC\Api\Rbac\Permissions\AbstractProvider;
 use CakeDC\Auth\Rbac\PermissionMatchResult;
 use CakeDC\Auth\Rbac\RbacInterface;
 use CakeDC\Auth\Rbac\Rules\Rule;
+use CakeDC\Auth\Rbac\Rules\RuleRegistry;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LogLevel;
 
@@ -67,7 +68,7 @@ class ApiRbac implements RbacInterface
      *
      * @param array $config Class configuration
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         if (!isset($config['log'])) {
             $config['log'] = Configure::read('debug');
@@ -186,6 +187,9 @@ class ApiRbac implements RbacInterface
 
             if (is_callable($value)) {
                 $return = (bool)call_user_func($value, $user, $role, $request);
+            } elseif (is_array($value) && isset($value['className'])) {
+                $ruleInstance = RuleRegistry::get($value['className'], $value['options'] ?? []);
+                $return = (bool)$ruleInstance->allowed($user, $role, $request);
             } elseif ($value instanceof Rule) {
                 $return = $value->allowed($user, $role, $request);
             } elseif ($key === 'bypassAuth' && $value === true) {
